@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NHL Anytime Goal Scorer -- Live Board</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;0,9..40,800&family=Anybody:wght@800;900&display=swap');
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:#06152C; color:#EDF1F7; font-family:'DM Sans',sans-serif;
+  max-width:900px; margin:0 auto;
+}
+.hdr {
+  background:linear-gradient(135deg,#0A2247 0%,#0A1830 60%,#06152C 100%);
+  border-bottom:3px solid #D84048; padding:24px 20px;
+}
+.brand { display:flex; align-items:baseline; gap:8px; margin-bottom:10px; }
+.brand .r { font-family:'Anybody',sans-serif; font-weight:900; font-size:20px; color:#D84048; letter-spacing:0.5px; }
+.brand .w { font-family:'Anybody',sans-serif; font-weight:800; font-size:20px; color:#EDF1F7; }
+.eyebrow { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:#D84048; margin-bottom:6px; }
+.title { font-family:'Anybody',sans-serif; font-size:26px; font-weight:800; color:#EDF1F7; margin-bottom:4px; }
+.sub { font-size:12px; color:#93A4BD; }
+.statbar { display:flex; background:#0F2444; border-bottom:1px solid #21395C; flex-wrap:wrap; }
+.stat { padding:12px 16px; border-right:1px solid #21395C; }
+.stat .v { font-family:'Anybody',sans-serif; font-size:20px; font-weight:800; color:#E86A72; }
+.stat .l { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#93A4BD; margin-top:2px; }
+table { width:100%; border-collapse:collapse; }
+th { text-align:left; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#93A4BD; padding:10px 12px; background:#0F2444; border-bottom:2px solid #21395C; cursor:pointer; user-select:none; }
+th:hover { color:#EDF1F7; }
+td { padding:9px 12px; font-size:13px; border-bottom:1px solid #21395C; }
+tr:hover td { background:#16304F; }
+.name { font-weight:600; color:#EDF1F7; }
+.dim { color:#93A4BD; font-size:11px; }
+.num { text-align:right; font-family:'Anybody',sans-serif; font-weight:700; color:#E86A72; }
+.edge-pos { color:#34D399; }
+.edge-neg { color:#F87171; }
+.foot { padding:14px 20px; border-top:1px solid #21395C; background:#0F2444; font-size:10px; color:#93A4BD; display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; }
+.empty { padding:40px 20px; text-align:center; color:#93A4BD; }
+@media(max-width:520px){ .col-sog, .col-sp { display:none; } }
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="brand"><span class="r">&#9889;</span><span class="w">ROTOWIRE</span></div>
+  <div class="eyebrow">Betting Edge &middot; Live Odds</div>
+  <div class="title">NHL Anytime Goal Scorer -- Live Board</div>
+  <div class="sub" id="sub-line">Loading...</div>
+</div>
+
+<div class="statbar" id="statbar"></div>
+
+<div id="content"></div>
+
+<div class="foot">
+  <span>Data: MoneyPuck, NHL Stats API, DraftKings (live). Poisson-based, shrinkage-adjusted scoring model.</span>
+  <span><b style="color:#E86A72">RotoWire analysis</b></span>
+</div>
+
+<script>
+var SEED_DATA = __SEED_DATA_JSON__;
+
+var sortKey = 'adj';
+var sortDir = -1;
+
+function fairStr(fo) {
+  if (fo === null || fo === undefined) return 'N/A';
+  return fo > 0 ? '+' + fo : '' + fo;
+}
+
+function render() {
+  var players = (SEED_DATA.players || []).slice();
+  players.sort(function(a, b) {
+    var av = a[sortKey] === undefined ? -Infinity : a[sortKey];
+    var bv = b[sortKey] === undefined ? -Infinity : b[sortKey];
+    return sortDir * (av - bv);
+  });
+
+  var sub = document.getElementById('sub-line');
+  var d = new Date(SEED_DATA.updatedAt);
+  sub.textContent = SEED_DATA.date + ' \u00b7 last refreshed ' + d.toUTCString();
+
+  var statbar = document.getElementById('statbar');
+  statbar.innerHTML =
+    '<div class="stat"><div class="v">' + (SEED_DATA.games || []).length + '</div><div class="l">Games</div></div>' +
+    '<div class="stat"><div class="v">' + players.length + '</div><div class="l">Priced Skaters</div></div>';
+
+  var content = document.getElementById('content');
+  if (players.length === 0) {
+    content.innerHTML = '<div class="empty">No live-priced players right now. Check back closer to puck drop.</div>';
+    return;
+  }
+
+  var rows = players.map(function(p) {
+    var edgeClass = (p.edge || 0) > 0 ? 'edge-pos' : 'edge-neg';
+    return '<tr>' +
+      '<td class="name">' + p.n + '<div class="dim">' + p.t + ' vs ' + p.opp + '</div></td>' +
+      '<td class="num">' + p.adj + '%</td>' +
+      '<td class="num">' + fairStr(p.fo) + '</td>' +
+      '<td class="num">' + fairStr(p.dk) + '</td>' +
+      '<td class="num ' + edgeClass + '">' + (p.edge > 0 ? '+' : '') + p.edge + '%</td>' +
+      '</tr>';
+  }).join('');
+
+  content.innerHTML =
+    '<table><thead><tr>' +
+    '<th data-k="n">Player</th>' +
+    '<th data-k="adj">ATG%</th>' +
+    '<th data-k="fo">Fair</th>' +
+    '<th data-k="dk">DK</th>' +
+    '<th data-k="edge">Edge</th>' +
+    '</tr></thead><tbody>' + rows + '</tbody></table>';
+
+  var ths = content.querySelectorAll('th');
+  for (var i = 0; i < ths.length; i++) {
+    ths[i].addEventListener('click', function() {
+      var k = this.getAttribute('data-k');
+      if (sortKey === k) { sortDir = -sortDir; } else { sortKey = k; sortDir = -1; }
+      render();
+    });
+  }
+}
+
+render();
+</script>
+
+</body>
+</html>
