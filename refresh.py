@@ -11,7 +11,7 @@ odds and game totals from Optic Odds, recompute edge/EV, drop anyone with no liv
 and write index.html for GitHub Pages.
 The model itself (Poisson rates, matchup multipliers) is NOT recomputed here.
 """
-import os, sys, json, difflib, datetime, urllib.request, urllib.parse
+import os, sys, json, difflib, datetime, unicodedata, urllib.request, urllib.parse
 from zoneinfo import ZoneInfo
 
 API_KEY = os.environ.get("OPTIC_ODDS_API_KEY")
@@ -63,6 +63,52 @@ def get_todays_games():
     return games
 
 
+def norm(name):
+    """Lower-case, accent-free, punctuation-free form of a player name, for cross-source matching."""
+    n = unicodedata.normalize("NFKD", name or "")
+    n = "".join(ch for ch in n if not unicodedata.combining(ch)).lower()
+    return " ".join("".join(ch if ch.isalnum() or ch == " " else " " for ch in n).split())
+
+
+def name_match(a, b, cutoff=0.9):
+    na, nb = norm(a), norm(b)
+    return bool(na) and bool(nb) and (na == nb or difflib.SequenceMatcher(None, na, nb).ratio() >= cutoff)
+
+
+def get_teams_played_yesterday():
+    """Teams with a game on the previous US-Eastern day (for the 'Opp on B2B' filter)."""
+    et_today = datetime.datetime.now(ET).date()
+    after = (et_today - datetime.timedelta(days=1)).strftime("%Y-%m-%dT09:00:00Z")
+    before = et_today.strftime("%Y-%m-%dT09:00:00Z")
+    qs = urllib.parse.urlencode({"sport": "hockey", "league": "nhl",
+                                 "start_date_after": after, "start_date_before": before})
+    teams = set()
+    for g in http_get(f"{API_BASE}/fixtures?{qs}").get("data", []):
+        if g.get("status") in ("cancelled", "postponed"):
+            continue
+        for side in ("home_competitors", "away_competitors"):
+            if g.get(side):
+                nm = g[side][0]["name"]
+                teams.add(TEAM_ABBR.get(nm, nm))
+    return teams
+
+
+def load_pp1():
+    """PP1 units by team from lineups.json (published by n8n from DailyFaceOff), or None if unavailable."""
+    try:
+        d = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "lineups.json")))
+        teams = d.get("teams", {})
+        if len(teams) < 26:
+            print("lineups.json has too few teams -- PP1 falls back to the built-in list.", file=sys.stderr)
+            return None
+        return {t: e.get("pp1", []) for t, e in teams.items() if len(e.get("pp1", [])) >= 3}
+    except FileNotFoundError:
+        print("lineups.json not found -- PP1 falls back to the built-in list.", file=sys.stderr)
+    except Exception as e:
+        print(f"lineups.json unreadable ({e}) -- PP1 falls back to the built-in list.", file=sys.stderr)
+    return None
+
+
 def fetch_odds(fixture_id, market):
     qs = urllib.parse.urlencode({"fixture_id": fixture_id, "market": market, "sportsbook": "draftkings"})
     try:
@@ -73,24 +119,28 @@ def fetch_odds(fixture_id, market):
 
 
 def get_market_data(games):
-    odds_map, totals = {}, {}
+    odds_map, totals, odds_names = {}, {}, {}
     for g in games:
         for item in fetch_odds(g["id"], "anytime_goal_scorer").get("data", []):
             for o in item.get("odds", []):
                 if o.get("name") and o.get("price") is not None:
                     odds_map[o["name"].lower()] = o["price"]
+                    odds_names[o["name"].lower()] = o["name"]
         for item in fetch_odds(g["id"], "total_goals").get("data", []):
             for o in item.get("odds", []):
                 if o.get("points") and "Over" in str(o.get("name", "")):
                     totals[g["away"] + "-" + g["home"]] = o["points"]
-    return odds_map, totals
+    return odds_map, totals, odds_names
 
 
 def implied_prob(price):
     return 100 / (price + 100) * 100 if price > 0 else abs(price) / (abs(price) + 100) * 100
 
 
-def refresh_players(pool, odds_map, opp_map):
+RENAMES = []
+
+
+def refresh_players(pool, odds_map, opp_map, odds_names=None, pp1_by_team=None, b2b_teams=None):
     keys = list(odds_map)
     kept = []
     for p in pool:
@@ -108,8 +158,15 @@ def refresh_players(pool, odds_map, opp_map):
             close = difflib.get_close_matches(key, keys, n=1, cutoff=0.85)
             if close:
                 price = odds_map[close[0]]
+                if odds_names and odds_names.get(close[0]) and odds_names[close[0]] != p["n"]:
+                    RENAMES.append((p["n"], odds_names[close[0]]))
+                    p["n"] = odds_names[close[0]]  # use the sportsbook's correct spelling (fixes dropped letters/accents)
         if price is None:
             continue
+        if pp1_by_team is not None and p["t"] in pp1_by_team:
+            p["pp1"] = 1 if any(name_match(p["n"], n) for n in pp1_by_team[p["t"]]) else 0
+        if b2b_teams is not None:
+            p["b2b"] = 1 if p["opp"] in b2b_teams else 0
         p["dk"] = price
         p["edge"] = round(p["adj"] - implied_prob(price), 1)
         p["ev"] = 1 if p["edge"] > 0 else 0
@@ -134,12 +191,21 @@ def main():
     for g in games:
         opp_map[g["home"]] = g["away"]; opp_map[g["away"]] = g["home"]
 
-    odds_map, totals = get_market_data(games)
+    odds_map, totals, odds_names = get_market_data(games)
     print(f"Live odds for {len(odds_map)} players across {len(games)} games; totals for {len(totals)} games.")
     if not odds_map:
         print("No odds returned -- leaving existing index.html untouched."); return
 
-    players = refresh_players(pool, odds_map, opp_map)
+    pp1_by_team = load_pp1()
+    try:
+        b2b_teams = get_teams_played_yesterday()
+    except Exception as e:
+        print(f"yesterday's schedule unavailable ({e}) -- 'Opp on B2B' filter left off.", file=sys.stderr)
+        b2b_teams = None
+    players = refresh_players(pool, odds_map, opp_map, odds_names, pp1_by_team, b2b_teams)
+    if RENAMES:
+        print("Names corrected to the sportsbook's spelling:", "; ".join(f"{a} -> {b}" for a, b in RENAMES))
+    print(f"PP1 flagged: {sum(p.get('pp1', 0) for p in players)} | opponents on a back-to-back: {sorted(b2b_teams) if b2b_teams is not None else 'n/a'}")
     print(f"Board: {len(players)} players (pool had {len(pool)}).")
     if not players:
         print("Nothing to show -- leaving existing index.html untouched."); return

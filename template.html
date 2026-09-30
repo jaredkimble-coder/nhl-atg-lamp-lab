@@ -533,8 +533,8 @@
     var blurb = p.n + ' carries a matchup-adjusted ' + p.adj + '% ATG probability (Fair: ' + fo + ') vs ' + p.opp + '. Base: ' + p.base + '% (' + bfo + '). ' + gpg + ' G/game, ' + p.sog + ' SOG/game across ' + p.gp + ' GP. O/U: ' + ou + '.';
 
     var isEv = p.ev ? 1 : 0;
-    var isPP1 = (PP1_UNITS[p.t] && PP1_UNITS[p.t].indexOf(p.n) !== -1) ? 1 : 0;
-    var isOppB2B = OPP_B2B_TONIGHT ? 1 : 0;
+    var isPP1 = (p.pp1 !== undefined) ? (p.pp1 ? 1 : 0) : ((PP1_UNITS[p.t] && PP1_UNITS[p.t].indexOf(p.n) !== -1) ? 1 : 0);
+    var isOppB2B = (p.b2b !== undefined) ? (p.b2b ? 1 : 0) : (OPP_B2B_TONIGHT ? 1 : 0);
     var isHot = p.hot ? 1 : 0;
     var isDue = p.due ? 1 : 0;
     var isDtd = p.dtd ? 1 : 0;
