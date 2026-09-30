@@ -11,7 +11,7 @@ odds and game totals from Optic Odds, recompute edge/EV, drop anyone with no liv
 and write index.html for GitHub Pages.
 The model itself (Poisson rates, matchup multipliers) is NOT recomputed here.
 """
-import os, sys, json, difflib, datetime, unicodedata, urllib.request, urllib.parse
+import os, sys, json, math, difflib, datetime, unicodedata, urllib.request, urllib.parse
 from zoneinfo import ZoneInfo
 
 API_KEY = os.environ.get("OPTIC_ODDS_API_KEY")
@@ -187,6 +187,49 @@ def load_streaks(max_age_hours=30):
     return None, None
 
 
+def load_goalies():
+    """Goalie ratings (5v5 goals against / 5v5 expected goals against) keyed by normalized name, or None."""
+    try:
+        d = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "goalies.json")))
+        g = d.get("goalies", {})
+        return g if len(g) >= 60 else None
+    except Exception as e:
+        print(f"goalies.json unavailable ({e}) -- opponent-goalie adjustment skipped.", file=sys.stderr)
+        return None
+
+
+def load_starters():
+    """Tonight's starting goalies by team, or None. Ignored unless the file is for today's US-Eastern date."""
+    try:
+        d = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "starters.json")))
+        today = datetime.datetime.now(ET).strftime("%Y-%m-%d")
+        if d.get("date") != today:
+            print(f"starters.json is for {d.get('date')}, not {today} -- opponent-goalie adjustment skipped.", file=sys.stderr)
+            return None
+        return d.get("teams", {})
+    except Exception as e:
+        print(f"starters.json unavailable ({e}) -- opponent-goalie adjustment skipped.", file=sys.stderr)
+        return None
+
+
+def goalie_rating(goalies, name):
+    """Rating for a goalie by name (accents / nicknames tolerated), or None if he has no NHL data."""
+    n = norm(name)
+    if n in goalies:
+        return goalies[n]["mult"]
+    for k, v in goalies.items():
+        if name_match(name, v.get("n", k), 0.93):
+            return v["mult"]
+    return None
+
+
+def fair_odds(pct):
+    if pct <= 0 or pct >= 100:
+        return None
+    p = pct / 100
+    return round(-100 * p / (1 - p)) if p >= 0.5 else round(100 * (1 - p) / p)
+
+
 def fetch_odds(fixture_id, market):
     qs = urllib.parse.urlencode({"fixture_id": fixture_id, "market": market, "sportsbook": "draftkings"})
     try:
@@ -217,10 +260,12 @@ def implied_prob(price):
 
 RENAMES = []
 REMOVED_OUT = []
+RESCALED = []
+UNKNOWN_G = set()
 FLAGGED_DTD = []
 
 
-def refresh_players(pool, odds_map, opp_map, odds_names=None, pp1_by_team=None, b2b_teams=None, injuries=None, hot_keys=None, due_keys=None):
+def refresh_players(pool, odds_map, opp_map, odds_names=None, pp1_by_team=None, b2b_teams=None, injuries=None, hot_keys=None, due_keys=None, goalies=None, starters=None):
     keys = list(odds_map)
     kept = []
     for p in pool:
@@ -251,6 +296,23 @@ def refresh_players(pool, odds_map, opp_map, odds_names=None, pp1_by_team=None, 
         p["dk"] = price
         p["edge"] = round(p["adj"] - implied_prob(price), 1)
         p["ev"] = 1 if p["edge"] > 0 else 0
+        # Opponent goalie: rescale to tonight's actual starter (the pool was built with whichever goalie was assumed
+        # when n8n last ran). gm is the dampened goalie multiplier already baked into adj/lam.
+        if goalies is not None and starters is not None and starters.get(p["opp"]) and p.get("lam") and p.get("gm"):
+            st = starters[p["opp"]]
+            rating = goalie_rating(goalies, st["g"])
+            if rating is None:
+                rating = 1.0  # starter with no NHL data (call-up): neutral
+                UNKNOWN_G.add(st["g"])
+            gm_new = 1 + 0.5 * (rating - 1)
+            p["og"], p["ogc"] = st["g"], st.get("c", 0)
+            if abs(gm_new - p["gm"]) >= 0.006:
+                lam_new = p["lam"] * gm_new / p["gm"]
+                p["adj"] = round((1 - math.exp(-lam_new)) * 100, 1)
+                p["gm"] = round(gm_new, 2)
+                p["delta"] = round(p["adj"] - p["base"], 1)
+                p["fo"] = fair_odds(p["adj"])
+                RESCALED.append(p["n"])
         p["hot"] = 1 if (hot_keys is not None and streak_key in hot_keys) else 0
         p["due"] = 1 if (due_keys is not None and streak_key in due_keys) else 0
         p["dtd"] = 0
@@ -295,7 +357,10 @@ def main():
         b2b_teams = None
     injuries = load_injuries()
     hot_keys, due_keys = load_streaks()
-    players = refresh_players(pool, odds_map, opp_map, odds_names, pp1_by_team, b2b_teams, injuries, hot_keys, due_keys)
+    goalies, starters = load_goalies(), load_starters()
+    players = refresh_players(pool, odds_map, opp_map, odds_names, pp1_by_team, b2b_teams, injuries, hot_keys, due_keys, goalies, starters)
+    if goalies is not None and starters is not None:
+        print(f"Goalies: rescaled {len(RESCALED)} players to tonight's starters" + (f" | starters with no NHL data (treated as average): {', '.join(sorted(UNKNOWN_G))}" if UNKNOWN_G else ""))
     print(f"Streaks: Hot {sum(p.get('hot', 0) for p in players)}: {', '.join(p['n'] for p in players if p.get('hot')) or 'none'} | Due {sum(p.get('due', 0) for p in players)}: {', '.join(p['n'] for p in players if p.get('due')) or 'none'}")
     if injuries is not None:
         print(f"Injuries: removed {len(REMOVED_OUT)} out/IR: {', '.join(REMOVED_OUT) or 'none'} | flagged {len(FLAGGED_DTD)} day-to-day: {', '.join(FLAGGED_DTD) or 'none'}")

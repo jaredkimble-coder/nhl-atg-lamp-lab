@@ -574,11 +574,12 @@
           muChip(p.dm, p.gm, p.delta) +
           (isPP1 ? '<span class="do-nhlatg-chip do-chip-good">PP1</span>' : '') +
           '<span class="do-nhlatg-chip do-chip-neutral">Opp B2B: ' + (isOppB2B ? 'Yes' : 'No') + '</span>' +
+          (p.og ? '<span class="do-nhlatg-chip do-chip-neutral">Opp G: ' + p.og + (p.ogc ? '' : ' (likely)') + '</span>' : '') +
           (isHot ? '<span class="do-nhlatg-chip do-chip-good">Hot: L10</span>' : '') +
           (isDue ? '<span class="do-nhlatg-chip do-chip-avg">Due: L10</span>' : '') +
           (isDtd ? '<span class="do-nhlatg-chip do-chip-bad">DTD: game-time decision</span>' : '') +
           (p.dk ? '<span class="do-nhlatg-chip ' + (isEv ? 'do-chip-good' : 'do-chip-neutral') + '">DK: ' + (p.dk > 0 ? '+' : '') + p.dk + '</span>' : '') +
-          (p.edge ? '<span class="do-nhlatg-chip do-chip-good">Edge: +' + (typeof p.edge === 'number' ? p.edge.toFixed(1) : p.edge) + '%</span>' : '') +
+          (p.edge ? '<span class="do-nhlatg-chip ' + (p.edge > 0 ? 'do-chip-good' : 'do-chip-bad') + '">Edge: ' + (p.edge > 0 ? '+' : '') + (typeof p.edge === 'number' ? p.edge.toFixed(1) : p.edge) + '%</span>' : '') +
           '<span class="do-nhlatg-chip ' + (isHt ? 'do-chip-good' : 'do-chip-neutral') + '">O/U: ' + ou + '</span>' +
           '<span class="do-nhlatg-chip do-chip-neutral">' + p.gp + ' GP | ' + p.g + ' G</span>' +
           '<span class="do-nhlatg-chip do-chip-neutral">SOG/G: ' + p.sog + '</span>' +
