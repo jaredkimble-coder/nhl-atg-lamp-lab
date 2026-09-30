@@ -1,0 +1,124 @@
+{
+ "updatedAt": "2026-09-30T08:25:03.189Z",
+ "nights": 1,
+ "firstDate": "2026-09-29",
+ "lastDate": "2026-09-29",
+ "playersGraded": 34,
+ "expectedScorers": 5.2,
+ "actualScorers": 6,
+ "calibration": [
+  {
+   "range": "0-10%",
+   "n": 12,
+   "predictedPct": 5.3,
+   "actualPct": 16.7
+  },
+  {
+   "range": "10-15%",
+   "n": 5,
+   "predictedPct": 12.2,
+   "actualPct": 20
+  },
+  {
+   "range": "15-20%",
+   "n": 5,
+   "predictedPct": 16.7,
+   "actualPct": 0
+  },
+  {
+   "range": "20-25%",
+   "n": 6,
+   "predictedPct": 22.4,
+   "actualPct": 16.7
+  },
+  {
+   "range": "25-30%",
+   "n": 4,
+   "predictedPct": 26.9,
+   "actualPct": 25
+  },
+  {
+   "range": "30-40%",
+   "n": 2,
+   "predictedPct": 36.5,
+   "actualPct": 50
+  },
+  {
+   "range": "40-+%",
+   "n": 0,
+   "predictedPct": null,
+   "actualPct": null
+  }
+ ],
+ "plusEv": [
+  {
+   "minEdgePts": 0.0001,
+   "n": 13,
+   "hits": 1,
+   "hitPct": 7.7,
+   "units": 3,
+   "roiPct": 23.1
+  },
+  {
+   "minEdgePts": 3,
+   "n": 4,
+   "hits": 0,
+   "hitPct": 0,
+   "units": -4,
+   "roiPct": -100
+  },
+  {
+   "minEdgePts": 5,
+   "n": 3,
+   "hits": 0,
+   "hitPct": 0,
+   "units": -3,
+   "roiPct": -100
+  }
+ ],
+ "brier": {
+  "pricedPlayers": 34,
+  "model": 0.1443,
+  "market": 0.1348,
+  "note": "lower is better; the market figure uses DraftKings prices as-is (vig not removed), so it is slightly pessimistic for the market"
+ },
+ "byFlag": [
+  {
+   "flag": "Hot",
+   "n": 3,
+   "predictedPct": 18.8,
+   "actualPct": 0
+  },
+  {
+   "flag": "Due",
+   "n": 1,
+   "predictedPct": 15.7,
+   "actualPct": 0
+  },
+  {
+   "flag": "PP1",
+   "n": 9,
+   "predictedPct": 25.3,
+   "actualPct": 44.4
+  },
+  {
+   "flag": "Day-to-day",
+   "n": 0,
+   "predictedPct": null,
+   "actualPct": null
+  },
+  {
+   "flag": "Goalie confirmed",
+   "n": 34,
+   "predictedPct": 15.4,
+   "actualPct": 17.6
+  },
+  {
+   "flag": "Easy matchup",
+   "n": 8,
+   "predictedPct": 22.6,
+   "actualPct": 0
+  }
+ ],
+ "notes": "Only players who appeared in a box score are graded (sportsbooks void bets on players who do not play). Snapshots hold each player's last pre-game numbers."
+}
