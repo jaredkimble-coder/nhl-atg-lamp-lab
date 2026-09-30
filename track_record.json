@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-09-30T08:25:03.189Z",
+ "updatedAt": "2026-09-30T13:57:47.786Z",
  "nights": 1,
  "firstDate": "2026-09-29",
  "lastDate": "2026-09-29",
@@ -53,18 +53,18 @@
  "plusEv": [
   {
    "minEdgePts": 0.0001,
-   "n": 13,
-   "hits": 1,
-   "hitPct": 7.7,
-   "units": 3,
-   "roiPct": 23.1
+   "n": 12,
+   "hits": 0,
+   "hitPct": 0,
+   "units": -12,
+   "roiPct": -100
   },
   {
    "minEdgePts": 3,
-   "n": 4,
+   "n": 3,
    "hits": 0,
    "hitPct": 0,
-   "units": -4,
+   "units": -3,
    "roiPct": -100
   },
   {
@@ -120,5 +120,5 @@
    "actualPct": 0
   }
  ],
- "notes": "Only players who appeared in a box score are graded (sportsbooks void bets on players who do not play). Snapshots hold each player's last pre-game numbers."
+ "notes": "Only players who appeared in a box score are graded (sportsbooks void bets on players who do not play). Snapshots hold each player's last pre-game numbers. Edge = model % minus the price's implied %, recomputed at grading time."
 }
