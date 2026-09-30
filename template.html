@@ -575,6 +575,7 @@
           (isPP1 ? '<span class="do-nhlatg-chip do-chip-good">PP1</span>' : '') +
           '<span class="do-nhlatg-chip do-chip-neutral">Opp B2B: ' + (isOppB2B ? 'Yes' : 'No') + '</span>' +
           (p.og ? '<span class="do-nhlatg-chip do-chip-neutral">Opp G: ' + p.og + (p.ogc ? '' : ' (likely)') + '</span>' : '') +
+          (p.pt ? '<span class="do-nhlatg-chip do-chip-neutral">New team: was ' + p.pt + '</span>' : '') +
           (isHot ? '<span class="do-nhlatg-chip do-chip-good">Hot: L10</span>' : '') +
           (isDue ? '<span class="do-nhlatg-chip do-chip-avg">Due: L10</span>' : '') +
           (isDtd ? '<span class="do-nhlatg-chip do-chip-bad">DTD: game-time decision</span>' : '') +
@@ -689,7 +690,7 @@
     html += '<div class="do-nhlatg-statbar">';
     html += '<div class="do-nhlatg-stat"><div class="do-nhlatg-sv">' + games.length + '</div><div class="do-nhlatg-sl">Games Tonight</div></div>';
     html += '<div class="do-nhlatg-stat"><div class="do-nhlatg-sv">' + players.length + '</div><div class="do-nhlatg-sl">Skaters on Slate</div></div>';
-    html += '<div class="do-nhlatg-stat"><div class="do-nhlatg-sv">25-26</div><div class="do-nhlatg-sl">Rate Sample</div></div>';
+    html += '<div class="do-nhlatg-stat"><div class="do-nhlatg-sv">25-27</div><div class="do-nhlatg-sl">Rate Sample (2 Seasons)</div></div>';
     html += '</div>';
 
     /* Tabs */
@@ -734,7 +735,7 @@
     html += '<div class="do-nhlatg-methhdr">How the Model Works</div>';
     html += '<p>Lamp Lab is a <strong>Poisson-based goalscorer projection model</strong> that estimates each skater&#8217;s probability of scoring at least one goal tonight.</p>';
     html += '<div class="do-nhlatg-methhdr">Inputs</div>';
-    html += '<p><strong>Scoring rate:</strong> Goals per game from the 2025-26 NHL season, shrinkage-adjusted toward a positional prior so small-sample players (rookies, injury-return) aren&#8217;t wildly over- or under-projected.</p>';
+    html += '<p><strong>Scoring rate:</strong> Goals and expected goals per game, blended between last season (2025-26) and this season (2026-27) by how many games each player has played this year: 0% this season until 10 games, 50% at 10, 60% at 15, 80% at 20 and 100% from 25. The blended rate is then shrinkage-adjusted toward a positional prior so small-sample players (rookies, injury-return) aren&#8217;t wildly over- or under-projected.</p>';
     html += '<p><strong>Matchup multiplier (50% dampening):</strong> How the opposing defense allows goals vs. league average, blended with the skater&#8217;s own team&#8217;s offensive environment. The multiplier is dampened 50% toward 1.0 to avoid overfitting noisy defensive splits.</p>';
     html += '<p><strong>Game total:</strong> The sportsbook over/under for tonight&#8217;s game, used as a proxy for expected goal environment.</p>';
     html += '<div class="do-nhlatg-methhdr">Calculation</div>';
