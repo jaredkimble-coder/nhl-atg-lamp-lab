@@ -371,7 +371,8 @@
      and will compute correctly once real schedule data is wired in for future slates. */
   var OPP_B2B_TONIGHT = false;
   /* Goals-against-by-position, GA/GP, 2025-26 season. Source: MoneyPuck via ShotPropz.com (shotpropz.com/nhl/goals-against-by-position). Last updated per source: 2026-06-15. Editable table -- update these four numbers per team when refreshed. */
-  var DVP_LEAGUE = {
+  var DVP_LIVE = __DVP_JSON__;
+  var DVP_LEAGUE = DVP_LIVE || {
     'ANA':{C:1.28,LW:0.75,RW:0.92,D:0.56},
     'BOS':{C:1.11,LW:0.67,RW:0.73,D:0.49},
     'BUF':{C:1.26,LW:0.59,RW:0.69,D:0.33},
@@ -640,7 +641,7 @@
       h += '</div>';
     });
     h += '</div>';
-    h += '<div class="do-nhlatg-note" style="margin-top:10px;">Data: MoneyPuck goals-against by position (via ShotPropz.com), 2025-26 season. Green = top-third league rank (favorable matchup); red = bottom-third (tough matchup). This tab is a standalone reference and is not baked into the ATG% projections above.</div>';
+    h += '<div class="do-nhlatg-note" style="margin-top:10px;">Data: MoneyPuck goals-against by position (via ShotPropz.com), regular season, refreshed daily. Green = top-third league rank (favorable matchup); red = bottom-third (tough matchup). The same numbers drive the matchup multiplier in the ATG% projections above.</div>';
     return h;
   }
 
@@ -722,7 +723,7 @@
 
     /* DVP panel */
     html += '<div class="do-nhlatg-panel" data-panel="dvp" style="display:none;">';
-    html += '<p style="color:#8494AC;font-size:12px;line-height:1.55;margin-bottom:14px;">Real goals-against-per-game by position for tonight&#8217;s opponents, ranked against the full 32-team league (1 = allows the most, easiest matchup). Source: MoneyPuck via ShotPropz.com. This is a reference table only &#8212; it is separate from the shrinkage-adjusted matchup multiplier used in the ATG% model.</p>';
+    html += '<p style="color:#8494AC;font-size:12px;line-height:1.55;margin-bottom:14px;">Real goals-against-per-game by position for tonight&#8217;s opponents, ranked against the full 32-team league (1 = allows the most, easiest matchup). Source: MoneyPuck via ShotPropz.com. This is the same data behind the matchup multiplier in the ATG% model (dampened 50% toward league average). Refreshed daily.</p>';
     html += buildDVPTab(players);
     html += '</div>';
 

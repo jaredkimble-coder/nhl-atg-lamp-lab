@@ -153,7 +153,21 @@ def main():
         "killers": killers,
         "players": players,
     }
-    out = template.replace("__SEED_DATA_JSON__", json.dumps(seed, separators=(",", ":")))
+    dvp = "null"
+    try:
+        dj = json.load(open(os.path.join(here, "defense.json")))
+        teams_d = dj.get("teams", {})
+        ok = len(teams_d) == 32 and all(
+            isinstance(v.get(p), (int, float)) for v in teams_d.values() for p in ("C", "LW", "RW", "D"))
+        if ok:
+            dvp = json.dumps(teams_d, separators=(",", ":"))
+        else:
+            print("defense.json failed validation -- Def vs. Position tab keeps its built-in table.", file=sys.stderr)
+    except FileNotFoundError:
+        print("defense.json not found -- Def vs. Position tab keeps its built-in table.", file=sys.stderr)
+    except Exception as e:
+        print(f"defense.json unreadable ({e}) -- Def vs. Position tab keeps its built-in table.", file=sys.stderr)
+    out = template.replace("__DVP_JSON__", dvp).replace("__SEED_DATA_JSON__", json.dumps(seed, separators=(",", ":")))
     open(os.path.join(here, "index.html"), "w").write(out)
     print("Wrote index.html.")
 
