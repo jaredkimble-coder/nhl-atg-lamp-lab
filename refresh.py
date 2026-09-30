@@ -247,10 +247,15 @@ def get_market_data(games):
                 if o.get("name") and o.get("price") is not None:
                     odds_map[o["name"].lower()] = o["price"]
                     odds_names[o["name"].lower()] = o["name"]
+        # DraftKings lists many alternate total lines (3.5 ... 9.5). The real game total is the one whose Over price is
+        # closest to even money -- taking the last line listed (the old behaviour) gave nonsense like 3.5 or 9.5.
+        cands = []
         for item in fetch_odds(g["id"], "total_goals").get("data", []):
             for o in item.get("odds", []):
-                if o.get("points") and "Over" in str(o.get("name", "")):
-                    totals[g["away"] + "-" + g["home"]] = o["points"]
+                if o.get("points") and o.get("price") is not None and "Over" in str(o.get("name", "")):
+                    cands.append((o["points"], o["price"]))
+        if cands:
+            totals[g["away"] + "-" + g["home"]] = min(cands, key=lambda c: abs(implied_prob(c[1]) - 50))[0]
     return odds_map, totals, odds_names
 
 
@@ -313,6 +318,10 @@ def refresh_players(pool, odds_map, opp_map, odds_names=None, pp1_by_team=None, 
                 p["delta"] = round(p["adj"] - p["base"], 1)
                 p["fo"] = fair_odds(p["adj"])
                 RESCALED.append(p["n"])
+        # The goalie rescale above changes p["adj"], so the edge and +EV flag MUST be recomputed from the final probability
+        # (they were previously calculated before the rescale and left stale for every player whose opposing goalie changed).
+        p["edge"] = round(p["adj"] - implied_prob(price), 1)
+        p["ev"] = 1 if p["edge"] > 0 else 0
         p["hot"] = 1 if (hot_keys is not None and streak_key in hot_keys) else 0
         p["due"] = 1 if (due_keys is not None and streak_key in due_keys) else 0
         p["dtd"] = 0
