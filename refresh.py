@@ -63,6 +63,11 @@ def get_todays_games():
     return games
 
 
+# Common first-name nicknames that are not simple prefixes (Matt/Matthew, Zach/Zachary are handled by the prefix rule).
+NICKNAMES = {frozenset(p) for p in [("nick", "nicholas"), ("mike", "michael"), ("jake", "jacob"),
+                                     ("tony", "anthony"), ("bobby", "robert"), ("bob", "robert")]}
+
+
 def norm(name):
     """Lower-case, accent-free, punctuation-free form of a player name, for cross-source matching."""
     n = unicodedata.normalize("NFKD", name or "")
@@ -71,8 +76,21 @@ def norm(name):
 
 
 def name_match(a, b, cutoff=0.9):
+    """Same player? Exact/near spelling match, or a nickname (same last name and one first name is a
+    prefix of the other: Matt/Matthew, Zach/Zachary, Nick/Nicholas). Only ever used within one team."""
     na, nb = norm(a), norm(b)
-    return bool(na) and bool(nb) and (na == nb or difflib.SequenceMatcher(None, na, nb).ratio() >= cutoff)
+    if not na or not nb:
+        return False
+    if na == nb or difflib.SequenceMatcher(None, na, nb).ratio() >= cutoff:
+        return True
+    ta, tb = na.split(), nb.split()
+    if len(ta) == len(tb) >= 2 and ta[-1] == tb[-1] and ta[1:-1] == tb[1:-1]:
+        fa, fb = ta[0], tb[0]
+        if frozenset((fa, fb)) in NICKNAMES:
+            return True
+        short, long_ = (fa, fb) if len(fa) <= len(fb) else (fb, fa)
+        return len(short) >= 3 and long_.startswith(short)
+    return False
 
 
 def get_teams_played_yesterday():
@@ -109,6 +127,66 @@ def load_pp1():
     return None
 
 
+def load_injuries(max_age_hours=8):
+    """Injury status by team from lineups.json (DailyFaceOff, refreshed by n8n).
+    Returns {team: {normalized_name: 'out' | 'dtd'}} or None if the file is missing/stale.
+    Stale data is ignored on purpose: a frozen injury list is worse than none."""
+    try:
+        d = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "lineups.json")))
+    except Exception as e:
+        print(f"lineups.json unavailable for injuries ({e}) -- skipping injury handling.", file=sys.stderr)
+        return None
+    try:
+        age = datetime.datetime.now(datetime.timezone.utc) - datetime.datetime.fromisoformat(d["updatedAt"].replace("Z", "+00:00"))
+        if age > datetime.timedelta(hours=max_age_hours):
+            print(f"lineups.json is {age.total_seconds()/3600:.1f}h old -- skipping injury handling.", file=sys.stderr)
+            return None
+    except Exception:
+        print("lineups.json has no valid timestamp -- skipping injury handling.", file=sys.stderr)
+        return None
+    out = {}
+    for team, e in d.get("teams", {}).items():
+        m = {}
+        for inj in e.get("injuries", []):
+            status = (inj.get("s") or "").lower()
+            if status in ("out", "ir"):
+                m[norm(inj["n"])] = "out"                      # out always wins
+            elif status == "dtd" or inj.get("gtd"):
+                m.setdefault(norm(inj["n"]), "dtd")
+        out[team] = m
+    return out
+
+
+def injury_status(team_map, name):
+    """'out', 'dtd' or None for a player, matched by name within their own team only."""
+    if not team_map:
+        return None
+    n = norm(name)
+    if n in team_map:
+        return team_map[n]
+    for k, v in team_map.items():
+        if name_match(n, k, 0.93):
+            return v
+    return None
+
+
+def load_streaks(max_age_hours=30):
+    """Hot / Due flags from streaks.json (computed by n8n twice a day). Returns (hot_keys, due_keys) or (None, None)
+    when the file is missing or stale -- a frozen streak list is worse than none."""
+    try:
+        d = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "streaks.json")))
+        age = datetime.datetime.now(datetime.timezone.utc) - datetime.datetime.fromisoformat(d["updatedAt"].replace("Z", "+00:00"))
+        if age > datetime.timedelta(hours=max_age_hours):
+            print(f"streaks.json is {age.total_seconds()/3600:.1f}h old -- Hot/Due flags left off.", file=sys.stderr)
+            return None, None
+        return set(d.get("hot", [])), set(d.get("due", []))
+    except FileNotFoundError:
+        print("streaks.json not found -- Hot/Due flags left off.", file=sys.stderr)
+    except Exception as e:
+        print(f"streaks.json unreadable ({e}) -- Hot/Due flags left off.", file=sys.stderr)
+    return None, None
+
+
 def fetch_odds(fixture_id, market):
     qs = urllib.parse.urlencode({"fixture_id": fixture_id, "market": market, "sportsbook": "draftkings"})
     try:
@@ -138,9 +216,11 @@ def implied_prob(price):
 
 
 RENAMES = []
+REMOVED_OUT = []
+FLAGGED_DTD = []
 
 
-def refresh_players(pool, odds_map, opp_map, odds_names=None, pp1_by_team=None, b2b_teams=None):
+def refresh_players(pool, odds_map, opp_map, odds_names=None, pp1_by_team=None, b2b_teams=None, injuries=None, hot_keys=None, due_keys=None):
     keys = list(odds_map)
     kept = []
     for p in pool:
@@ -152,6 +232,7 @@ def refresh_players(pool, odds_map, opp_map, odds_names=None, pp1_by_team=None, 
             continue
         p = dict(p)
         p["opp"] = opp_map[p["t"]]
+        streak_key = norm(p["n"]) + "|" + ("D" if p.get("p") == "D" else "F")
         key = p["n"].lower()
         price = odds_map.get(key)
         if price is None:
@@ -170,7 +251,17 @@ def refresh_players(pool, odds_map, opp_map, odds_names=None, pp1_by_team=None, 
         p["dk"] = price
         p["edge"] = round(p["adj"] - implied_prob(price), 1)
         p["ev"] = 1 if p["edge"] > 0 else 0
-        p["hot"], p["due"], p["dtd"] = 0, 0, 0  # placeholders until L10 / injury feeds exist
+        p["hot"] = 1 if (hot_keys is not None and streak_key in hot_keys) else 0
+        p["due"] = 1 if (due_keys is not None and streak_key in due_keys) else 0
+        p["dtd"] = 0
+        if injuries is not None:
+            status = injury_status(injuries.get(p["t"]), p["n"])
+            if status == "out":
+                REMOVED_OUT.append(f'{p["n"]} ({p["t"]})')
+                continue
+            if status == "dtd":
+                p["dtd"] = 1
+                FLAGGED_DTD.append(f'{p["n"]} ({p["t"]})')
         p.pop("lam", None)
         kept.append(p)
     kept.sort(key=lambda x: -x["adj"])
@@ -202,7 +293,12 @@ def main():
     except Exception as e:
         print(f"yesterday's schedule unavailable ({e}) -- 'Opp on B2B' filter left off.", file=sys.stderr)
         b2b_teams = None
-    players = refresh_players(pool, odds_map, opp_map, odds_names, pp1_by_team, b2b_teams)
+    injuries = load_injuries()
+    hot_keys, due_keys = load_streaks()
+    players = refresh_players(pool, odds_map, opp_map, odds_names, pp1_by_team, b2b_teams, injuries, hot_keys, due_keys)
+    print(f"Streaks: Hot {sum(p.get('hot', 0) for p in players)}: {', '.join(p['n'] for p in players if p.get('hot')) or 'none'} | Due {sum(p.get('due', 0) for p in players)}: {', '.join(p['n'] for p in players if p.get('due')) or 'none'}")
+    if injuries is not None:
+        print(f"Injuries: removed {len(REMOVED_OUT)} out/IR: {', '.join(REMOVED_OUT) or 'none'} | flagged {len(FLAGGED_DTD)} day-to-day: {', '.join(FLAGGED_DTD) or 'none'}")
     if RENAMES:
         print("Names corrected to the sportsbook's spelling:", "; ".join(f"{a} -> {b}" for a, b in RENAMES))
     print(f"PP1 flagged: {sum(p.get('pp1', 0) for p in players)} | opponents on a back-to-back: {sorted(b2b_teams) if b2b_teams is not None else 'n/a'}")

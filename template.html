@@ -742,8 +742,8 @@
     html += '<p>ATG% is converted to American odds. If a sportsbook prices a player&#8217;s anytime goal scorer line worse than the model&#8217;s fair price, that player is flagged as <strong>+EV</strong> (positive expected value). Edge = model implied probability minus book implied probability.</p>';
     html += '<div class="do-nhlatg-methhdr">What the Model Does NOT Do</div>';
     html += '<p>The matchup details (line placement, power-play role, goalie quality, back-to-back status) are shown as <strong>context chips</strong> but are <em>not</em> baked into the ATG number. Use them to apply your own judgment on top of the model output.</p>';
-    html += '<p><strong>Hot:</strong> Scored 4+ goals over last 10 games of the 2025-26 season AND that L10 rate is at least 1.4x the player&#8217;s full-season goals/game rate. Small-sample flag &#8212; not baked into ATG% above.</p>';
-    html += '<p><strong>Due:</strong> Expected goals (xG) over last 10 games of the 2025-26 season exceeded actual goals scored by 2.0+ &#8212; a regression-to-the-mean signal, not a prediction. Not baked into ATG% above.</p>';
+    html += '<p><strong>Hot:</strong> Scored 4+ goals over the last 10 games AND that L10 rate is at least 1.4x the player&#8217;s full-season goals/game rate. Small-sample flag &#8212; not baked into ATG% above.</p>';
+    html += '<p><strong>Due:</strong> Expected goals (xG) over the last 10 games exceeded actual goals scored by 2.0+ &#8212; a regression-to-the-mean signal, not a prediction. Not baked into ATG% above.</p>';
     html += '<div class="do-nhlatg-note">Data: MoneyPuck (scoring rates, L10 game logs), NHL Stats API (matchup splits), RotoWire (lineups, injuries). Odds: DraftKings via Optic Odds API.</div>';
     html += '</div></div>';
 
