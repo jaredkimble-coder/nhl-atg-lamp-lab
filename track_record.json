@@ -1,51 +1,51 @@
 {
- "updatedAt": "2026-11-01T09:25:04.391Z",
- "nights": 33,
+ "updatedAt": "2026-11-02T09:25:03.784Z",
+ "nights": 34,
  "firstDate": "2026-09-29",
- "lastDate": "2026-10-31",
- "playersGraded": 7132,
- "expectedScorers": 1127.5,
- "actualScorers": 1125,
+ "lastDate": "2026-11-01",
+ "playersGraded": 7290,
+ "expectedScorers": 1152.9,
+ "actualScorers": 1148,
  "calibration": [
   {
    "range": "0-10%",
-   "n": 2562,
-   "predictedPct": 5.4,
+   "n": 2619,
+   "predictedPct": 5.5,
    "actualPct": 7
   },
   {
    "range": "10-15%",
-   "n": 1158,
-   "predictedPct": 12.6,
-   "actualPct": 12.9
+   "n": 1186,
+   "predictedPct": 12.5,
+   "actualPct": 12.8
   },
   {
    "range": "15-20%",
-   "n": 1145,
+   "n": 1166,
    "predictedPct": 17.4,
-   "actualPct": 17.9
+   "actualPct": 18
   },
   {
    "range": "20-25%",
-   "n": 883,
+   "n": 901,
    "predictedPct": 22.3,
-   "actualPct": 20.2
+   "actualPct": 19.9
   },
   {
    "range": "25-30%",
-   "n": 600,
+   "n": 615,
    "predictedPct": 27.2,
-   "actualPct": 25
+   "actualPct": 24.7
   },
   {
    "range": "30-40%",
-   "n": 607,
-   "predictedPct": 33.9,
-   "actualPct": 31.6
+   "n": 621,
+   "predictedPct": 34,
+   "actualPct": 31.9
   },
   {
    "range": "40-+%",
-   "n": 177,
+   "n": 182,
    "predictedPct": 43.5,
    "actualPct": 40.7
   }
@@ -53,71 +53,71 @@
  "plusEv": [
   {
    "minEdgePts": 0.0001,
-   "n": 1969,
-   "hits": 282,
-   "hitPct": 14.3,
-   "units": -282.43,
-   "roiPct": -14.3
+   "n": 2004,
+   "hits": 290,
+   "hitPct": 14.5,
+   "units": -271.58,
+   "roiPct": -13.6
   },
   {
    "minEdgePts": 3,
-   "n": 743,
-   "hits": 132,
+   "n": 757,
+   "hits": 135,
    "hitPct": 17.8,
-   "units": -47.33,
-   "roiPct": -6.4
+   "units": -49.23,
+   "roiPct": -6.5
   },
   {
    "minEdgePts": 5,
-   "n": 326,
-   "hits": 63,
-   "hitPct": 19.3,
-   "units": -3.23,
-   "roiPct": -1
+   "n": 333,
+   "hits": 65,
+   "hitPct": 19.5,
+   "units": -1.23,
+   "roiPct": -0.4
   }
  ],
  "brier": {
-  "pricedPlayers": 7132,
-  "model": 0.1248,
+  "pricedPlayers": 7290,
+  "model": 0.1246,
   "market": 0.1235,
   "note": "lower is better; the market figure uses DraftKings prices as-is (vig not removed), so it is slightly pessimistic for the market"
  },
  "byFlag": [
   {
    "flag": "Hot",
-   "n": 471,
-   "predictedPct": 22.4,
+   "n": 483,
+   "predictedPct": 22.5,
    "actualPct": 24.4
   },
   {
    "flag": "Due",
-   "n": 155,
-   "predictedPct": 22.6,
-   "actualPct": 31
+   "n": 159,
+   "predictedPct": 22.5,
+   "actualPct": 30.8
   },
   {
    "flag": "PP1",
-   "n": 2102,
+   "n": 2151,
    "predictedPct": 25.4,
-   "actualPct": 26.3
+   "actualPct": 26.2
   },
   {
    "flag": "Day-to-day",
-   "n": 30,
-   "predictedPct": 18.2,
-   "actualPct": 16.7
+   "n": 32,
+   "predictedPct": 17.4,
+   "actualPct": 15.6
   },
   {
    "flag": "Goalie confirmed",
-   "n": 4096,
+   "n": 4196,
    "predictedPct": 16.3,
-   "actualPct": 16.5
+   "actualPct": 16.4
   },
   {
    "flag": "Easy matchup",
-   "n": 608,
+   "n": 611,
    "predictedPct": 27.4,
-   "actualPct": 23.8
+   "actualPct": 23.9
   }
  ],
  "notes": "Only players who appeared in a box score are graded (sportsbooks void bets on players who do not play). Snapshots hold each player's last pre-game numbers. Edge = model % minus the price's implied %, recomputed at grading time."
