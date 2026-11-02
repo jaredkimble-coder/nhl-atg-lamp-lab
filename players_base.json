@@ -158,8 +158,8 @@
 {"n":"Sam Dickinson","t":"SJS","p":"D","gp":85,"g":1,"sog":1,"base":1.4,"adj":1.4,"fo":7243,"bfo":6887,"dm":1.01,"gm":0.94,"delta":-0.1,"lam":0.014,"opp":"CGY","sp":{"gp":3,"g":0,"scored_in":0,"atg":0},"pt":""},
 {"n":"Ethan Del Mastro","t":"CHI","p":"D","gp":19,"g":0,"sog":0.9,"base":1.5,"adj":1.2,"fo":8102,"bfo":6402,"dm":0.84,"gm":0.94,"delta":-0.3,"lam":0.012,"opp":"COL","sp":{"gp":1,"g":0,"scored_in":0,"atg":0},"pt":""},
 {"n":"Jeremy Lauzon","t":"VGK","p":"D","gp":83,"g":1,"sog":1.1,"base":1.4,"adj":1.2,"fo":8130,"bfo":6966,"dm":1,"gm":0.86,"delta":-0.2,"lam":0.012,"opp":"BOS","sp":{"gp":2,"g":0,"scored_in":0,"atg":0},"pt":""},
-{"n":"Michael Kesselring","t":"SJS","p":"D","gp":49,"g":0,"sog":1.3,"base":1.2,"adj":1.1,"fo":8911,"bfo":8474,"dm":1.01,"gm":0.94,"delta":-0.1,"lam":0.011,"opp":"CGY","sp":{"gp":0,"g":0,"scored_in":0,"atg":0},"pt":"BUF"},
 {"n":"Kevin Korchinski","t":"CHI","p":"D","gp":13,"g":0,"sog":0.5,"base":1.4,"adj":1.1,"fo":9200,"bfo":7270,"dm":0.84,"gm":0.94,"delta":-0.3,"lam":0.011,"opp":"COL","sp":{"gp":1,"g":0,"scored_in":0,"atg":0},"pt":""},
+{"n":"Michael Kesselring","t":"SJS","p":"D","gp":49,"g":0,"sog":1.3,"base":1.2,"adj":1.1,"fo":8911,"bfo":8474,"dm":1.01,"gm":0.94,"delta":-0.1,"lam":0.011,"opp":"CGY","sp":{"gp":0,"g":0,"scored_in":0,"atg":0},"pt":"BUF"},
 {"n":"Dmitry Kulikov","t":"FLA","p":"D","gp":33,"g":0,"sog":0.6,"base":0.8,"adj":0.9,"fo":11582,"bfo":12230,"dm":0.98,"gm":1.08,"delta":0,"lam":0.009,"opp":"DET","sp":{"gp":2,"g":0,"scored_in":0,"atg":0},"pt":""},
 {"n":"Joel Hanley","t":"CGY","p":"D","gp":68,"g":0,"sog":0.6,"base":0.6,"adj":0.8,"fo":12759,"bfo":15691,"dm":1.13,"gm":1.09,"delta":0.1,"lam":0.008,"opp":"SJS","sp":{"gp":3,"g":0,"scored_in":0,"atg":0},"pt":""}
 ]
