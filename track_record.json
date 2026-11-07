@@ -1,83 +1,83 @@
 {
- "updatedAt": "2026-11-06T09:25:04.808Z",
- "nights": 38,
+ "updatedAt": "2026-11-07T09:25:03.327Z",
+ "nights": 39,
  "firstDate": "2026-09-29",
- "lastDate": "2026-11-05",
- "playersGraded": 8299,
- "expectedScorers": 1313.1,
- "actualScorers": 1306,
+ "lastDate": "2026-11-06",
+ "playersGraded": 8395,
+ "expectedScorers": 1328.4,
+ "actualScorers": 1322,
  "calibration": [
   {
    "range": "0-10%",
-   "n": 2969,
+   "n": 3001,
    "predictedPct": 5.4,
    "actualPct": 6.9
   },
   {
    "range": "10-15%",
-   "n": 1368,
+   "n": 1386,
    "predictedPct": 12.5,
    "actualPct": 12.8
   },
   {
    "range": "15-20%",
-   "n": 1320,
+   "n": 1339,
    "predictedPct": 17.4,
-   "actualPct": 18.1
+   "actualPct": 18
   },
   {
    "range": "20-25%",
-   "n": 1040,
+   "n": 1050,
    "predictedPct": 22.3,
    "actualPct": 20.5
   },
   {
    "range": "25-30%",
-   "n": 684,
+   "n": 692,
    "predictedPct": 27.2,
    "actualPct": 24.7
   },
   {
    "range": "30-40%",
-   "n": 705,
+   "n": 710,
    "predictedPct": 34,
-   "actualPct": 31.6
+   "actualPct": 31.8
   },
   {
    "range": "40-+%",
-   "n": 213,
+   "n": 217,
    "predictedPct": 43.7,
-   "actualPct": 38.5
+   "actualPct": 38.7
   }
  ],
  "plusEv": [
   {
    "minEdgePts": 0.0001,
-   "n": 2300,
-   "hits": 336,
+   "n": 2323,
+   "hits": 339,
    "hitPct": 14.6,
-   "units": -299.23,
-   "roiPct": -13
+   "units": -308.36,
+   "roiPct": -13.3
   },
   {
    "minEdgePts": 3,
-   "n": 870,
+   "n": 880,
    "hits": 148,
-   "hitPct": 17,
-   "units": -96.38,
-   "roiPct": -11.1
+   "hitPct": 16.8,
+   "units": -106.38,
+   "roiPct": -12.1
   },
   {
    "minEdgePts": 5,
-   "n": 385,
+   "n": 389,
    "hits": 71,
-   "hitPct": 18.4,
-   "units": -25.13,
-   "roiPct": -6.5
+   "hitPct": 18.3,
+   "units": -29.13,
+   "roiPct": -7.5
   }
  ],
  "brier": {
-  "pricedPlayers": 8299,
+  "pricedPlayers": 8395,
   "model": 0.1248,
   "market": 0.1237,
   "note": "lower is better; the market figure uses DraftKings prices as-is (vig not removed), so it is slightly pessimistic for the market"
@@ -85,39 +85,39 @@
  "byFlag": [
   {
    "flag": "Hot",
-   "n": 559,
+   "n": 565,
    "predictedPct": 23,
-   "actualPct": 23.6
+   "actualPct": 23.9
   },
   {
    "flag": "Due",
-   "n": 179,
-   "predictedPct": 21.7,
-   "actualPct": 30.7
+   "n": 180,
+   "predictedPct": 21.6,
+   "actualPct": 30.6
   },
   {
    "flag": "PP1",
-   "n": 2445,
+   "n": 2474,
    "predictedPct": 25.5,
-   "actualPct": 26.3
+   "actualPct": 26.4
   },
   {
    "flag": "Day-to-day",
-   "n": 33,
-   "predictedPct": 16.9,
-   "actualPct": 15.2
+   "n": 35,
+   "predictedPct": 17.5,
+   "actualPct": 14.3
   },
   {
    "flag": "Goalie confirmed",
-   "n": 4753,
+   "n": 4829,
    "predictedPct": 16.3,
    "actualPct": 16.4
   },
   {
    "flag": "Easy matchup",
-   "n": 705,
-   "predictedPct": 27.5,
-   "actualPct": 24.1
+   "n": 715,
+   "predictedPct": 27.6,
+   "actualPct": 24.5
   }
  ],
  "notes": "Only players who appeared in a box score are graded (sportsbooks void bets on players who do not play). Snapshots hold each player's last pre-game numbers. Edge = model % minus the price's implied %, recomputed at grading time."
