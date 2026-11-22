@@ -1,4 +1,5 @@
 [
 {"n":"Max Jones","t":"EDM","p":"L","gp":10,"g":0,"sog":0.9,"base":7.2,"adj":7.8,"fo":1183,"bfo":1280,"dm":0.98,"gm":1.1,"delta":0.5,"lam":0.081,"opp":"STL","sp":{"gp":1,"g":0,"scored_in":0,"atg":0},"pt":""},
-{"n":"Alberts Smits","t":"NYR","p":"D","gp":17,"g":0,"sog":0.5,"base":3.4,"adj":3,"fo":3218,"bfo":2877,"dm":0.87,"gm":1.03,"delta":-0.3,"lam":0.031,"opp":"CAR","sp":{"gp":0,"g":0,"scored_in":0,"atg":0},"pt":""}
+{"n":"Alberts Smits","t":"NYR","p":"D","gp":17,"g":0,"sog":0.5,"base":3.4,"adj":3,"fo":3218,"bfo":2877,"dm":0.87,"gm":1.03,"delta":-0.3,"lam":0.031,"opp":"CAR","sp":{"gp":0,"g":0,"scored_in":0,"atg":0},"pt":""},
+{"n":"Lian Bichsel","t":"DAL","p":"D","gp":18,"g":0,"sog":0.5,"base":1.3,"adj":1.5,"fo":6742,"bfo":7351,"dm":1.02,"gm":1.07,"delta":0.1,"lam":0.015,"opp":"PIT","sp":{"gp":2,"g":1,"scored_in":1,"atg":50},"pt":""}
 ]
