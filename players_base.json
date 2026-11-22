@@ -1,4 +1,6 @@
 [
 {"n":"Max Jones","t":"EDM","p":"L","gp":10,"g":0,"sog":0.9,"base":7.2,"adj":7.8,"fo":1183,"bfo":1280,"dm":0.98,"gm":1.1,"delta":0.5,"lam":0.081,"opp":"STL","sp":{"gp":1,"g":0,"scored_in":0,"atg":0},"pt":""},
-{"n":"Alberts Smits","t":"NYR","p":"D","gp":17,"g":0,"sog":0.5,"base":3.4,"adj":3,"fo":3218,"bfo":2877,"dm":0.87,"gm":1.03,"delta":-0.3,"lam":0.031,"opp":"CAR","sp":{"gp":0,"g":0,"scored_in":0,"atg":0},"pt":""}
+{"n":"Alberts Smits","t":"NYR","p":"D","gp":17,"g":0,"sog":0.5,"base":3.4,"adj":3,"fo":3218,"bfo":2877,"dm":0.87,"gm":1.03,"delta":-0.3,"lam":0.031,"opp":"CAR","sp":{"gp":0,"g":0,"scored_in":0,"atg":0},"pt":""},
+{"n":"Louis Crevier","t":"BUF","p":"D","gp":17,"g":0,"sog":1.4,"base":2,"adj":1.8,"fo":5370,"bfo":5001,"dm":0.96,"gm":0.97,"delta":-0.1,"lam":0.018,"opp":"TBL","sp":{"gp":2,"g":0,"scored_in":0,"atg":0},"pt":""},
+{"n":"Ian Cole","t":"CHI","p":"D","gp":23,"g":0,"sog":0.8,"base":1.4,"adj":1.5,"fo":6424,"bfo":6820,"dm":1.08,"gm":0.99,"delta":0.1,"lam":0.015,"opp":"VAN","sp":{"gp":3,"g":0,"scored_in":0,"atg":0},"pt":""}
 ]
