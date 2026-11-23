@@ -1,15 +1,15 @@
 {
- "updatedAt": "2026-11-22T09:25:04.158Z",
- "nights": 53,
+ "updatedAt": "2026-11-23T09:25:03.860Z",
+ "nights": 54,
  "firstDate": "2026-09-29",
- "lastDate": "2026-11-21",
- "playersGraded": 11563,
- "expectedScorers": 1824.7,
+ "lastDate": "2026-11-22",
+ "playersGraded": 11565,
+ "expectedScorers": 1824.8,
  "actualScorers": 1797,
  "calibration": [
   {
    "range": "0-10%",
-   "n": 4106,
+   "n": 4108,
    "predictedPct": 5.3,
    "actualPct": 6.5
   },
@@ -77,9 +77,9 @@
   }
  ],
  "brier": {
-  "pricedPlayers": 11563,
+  "pricedPlayers": 11565,
   "model": 0.1233,
-  "market": 0.1224,
+  "market": 0.1223,
   "note": "lower is better; the market figure uses DraftKings prices as-is (vig not removed), so it is slightly pessimistic for the market"
  },
  "byFlag": [
@@ -109,7 +109,7 @@
   },
   {
    "flag": "Goalie confirmed",
-   "n": 6563,
+   "n": 6564,
    "predictedPct": 16.3,
    "actualPct": 16.4
   },
