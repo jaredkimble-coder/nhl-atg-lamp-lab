@@ -1,15 +1,15 @@
 {
- "updatedAt": "2026-11-24T09:25:03.306Z",
- "nights": 55,
+ "updatedAt": "2026-11-25T09:25:03.063Z",
+ "nights": 56,
  "firstDate": "2026-09-29",
- "lastDate": "2026-11-23",
- "playersGraded": 11569,
- "expectedScorers": 1824.9,
+ "lastDate": "2026-11-24",
+ "playersGraded": 11570,
+ "expectedScorers": 1825,
  "actualScorers": 1798,
  "calibration": [
   {
    "range": "0-10%",
-   "n": 4112,
+   "n": 4113,
    "predictedPct": 5.3,
    "actualPct": 6.5
   },
@@ -77,7 +77,7 @@
   }
  ],
  "brier": {
-  "pricedPlayers": 11569,
+  "pricedPlayers": 11570,
   "model": 0.1233,
   "market": 0.1224,
   "note": "lower is better; the market figure uses DraftKings prices as-is (vig not removed), so it is slightly pessimistic for the market"
